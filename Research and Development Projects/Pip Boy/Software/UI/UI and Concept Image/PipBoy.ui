@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QPushButton" name="pb_DispDrone1">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>384</y>
+      <width>200</width>
+      <height>96</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Drone #1</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pb_DispDrone3">
+    <property name="geometry">
+     <rect>
+      <x>400</x>
+      <y>384</y>
+      <width>200</width>
+      <height>96</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Drone #3</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pb_DispDrone4">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>384</y>
+      <width>200</width>
+      <height>96</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Drone #4</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pb_DispDrone2">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>384</y>
+      <width>200</width>
+      <height>96</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Drone #2</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lbl_CountDownTimer">
+    <property name="geometry">
+     <rect>
+      <x>629</x>
+      <y>0</y>
+      <width>161</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>3ds</family>
+      <pointsize>12</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+      <underline>true</underline>
+     </font>
+    </property>
+    <property name="text">
+     <string>99:99:99.00</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lbl_Help">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>350</y>
+      <width>51</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Help</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lbl_MissionStatus">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>330</y>
+      <width>241</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string> 4 Of 4 Codes found! 
+PIN: 99999</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
