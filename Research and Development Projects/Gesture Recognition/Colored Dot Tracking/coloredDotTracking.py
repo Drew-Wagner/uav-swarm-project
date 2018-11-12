@@ -1,3 +1,4 @@
+"""This file has mostly been replace by 'Glove Detection And Tracking'\gloveGestureTracking.py"""
 import cv2
 import numpy as np
 import time
