@@ -5,7 +5,7 @@ import time
 
 def hsv_color(h, s, v):
 	"""
-	Creates an HSV color as an numpy array.
+	Creates an HSV color as an numpy np.array.
 
 	:param h: A hue as an integer between 0 and 255
 	:param s: A saturation as an integer between 0 and 255
@@ -37,6 +37,9 @@ def get_distance_between_points(point1, point2):
 	:return: float
 	"""
 	return np.linalg.norm(point1 - point2)
+
+def normalize_vector(vector):
+	return vector/np.linalg.norm(vector)
 
 
 class ColorFinder:
@@ -248,9 +251,9 @@ class HandDetector:
 			avg_dr_dt = (dr_dt0 + dr_dt1) / 2
 			ddr_dt = (dr_dt1 - dr_dt0) / (d01 + d12)
 			if abs(ddr_dt) < 0.2 and abs(avg_dr_dt) < 0.7 and rpoint1[0] > radius:
-				if len(finger_tip_points) > 0 and np.linalg.norm(finger_tip_points[-1] - point1) < radius / 5:
+				if len(finger_tip_points) > 0 and np.linalg.norm(finger_tip_points[-1] - point1) < radius / 3:
 					finger_tip_points[-1] = (point1 + finger_tip_points[-1]) / 2
-				elif len(finger_tip_points) > 0 and np.linalg.norm(finger_tip_points[0] - point1) < radius / 5:
+				elif len(finger_tip_points) > 0 and np.linalg.norm(finger_tip_points[0] - point1) < radius / 3:
 					finger_tip_points[0] = (point1 + finger_tip_points[0]) / 2
 				else:
 					finger_tip_points.append(point1)
@@ -279,11 +282,93 @@ class HandDetector:
 		return hand_contour
 
 
+class HandPoseClassifier:
+
+	def __init__(self, *args):
+		self.POSES = {}
+		detector = HandDetector()
+		for arg in args:
+			try:
+				mask = cv2.imread(arg + ".png", 0)
+				hand_contour = detector.detect_hand_contour(mask)
+				hand_pos = detector.get_hand_center(hand_contour)
+				fingertips = detector.detect_finger_tips(hand_contour)
+				unit_vectors = HandPoseClassifier.get_finger_tip_unit_vectors(fingertips, hand_pos)
+				self.POSES[arg] = HandPoseClassifier.rotation_compensated_angles(unit_vectors)
+				print("Successfully processed pose from file: %s.png" % arg)
+			except:
+				print("Could not read image from file: " + arg + ".png")
+
+	@staticmethod
+	def get_finger_tip_unit_vectors(fingertips, center):
+		vectors = []
+		for ft in fingertips:
+			vectors.append(ft - center)
+
+		for i in range(len(vectors)):
+			vectors[i] = normalize_vector(vectors[i])
+		return vectors
+
+	@staticmethod
+	def get_average_vector(unit_vectors):
+		count = len(unit_vectors)
+		return normalize_vector(sum(unit_vectors)/count)
+
+	@staticmethod
+	def rotation_compensated_angles(unit_vectors):
+		avg_vector = HandPoseClassifier.get_average_vector(unit_vectors)
+		compensation_angle = -np.arccos(np.dot(avg_vector[0], np.array([0,-1])))
+		angles = []
+		for uv in unit_vectors:
+			angles.append(np.arccos(np.dot(uv[0], avg_vector[0])) + compensation_angle)
+		return angles
+
+
+	def classify(self, fingertips, center):
+		"""
+		Attemps to classify the hand position. Classification algorithm doesn't really work...
+
+		:param fingertips: array of located fingertips
+		:param center: center of the hand (used to obtain a vector to the fingertips)
+		:return:
+		"""
+		count_detected = len(fingertips)
+		if count_detected < 1:
+			return ""
+		tip_vectors = HandPoseClassifier.get_finger_tip_unit_vectors(fingertips, center)
+		detected_angles = HandPoseClassifier.rotation_compensated_angles(tip_vectors)
+
+		best = ""
+		highscore = -100
+		for name, pose in self.POSES.items():
+			score = 0
+			count_pose = len(pose)
+			if count_pose < count_detected:
+				mult = count_pose/count_detected
+			else:
+				mult = count_detected/count_pose
+
+			for desired_angle in pose:
+				min = 180
+				for detected_angle in detected_angles:
+					d = abs(desired_angle-detected_angle)
+					if d < min:
+						min = d
+				if min <= 45:
+					score += (1-(min/90)) / (count_pose)
+			score *= mult
+			if score >= highscore:
+				best = name
+				highscore = score
+		return best, highscore
+
+
 def main():
 	out = cv2.VideoWriter('output.avi', -1, 30.0, (640, 360))
 
-	purple_detector = ColorFinder("purple", hsv_color(143, 0, 0), hsv_color(215, 255, 225), True)
+	purple_detector = ColorFinder("purple", hsv_color(143, 57, 0), hsv_color(215, 255, 225), True)
 	hand_detector = HandDetector()
+	hand_classifier = HandPoseClassifier("one", "two", "three", "four", "five", "L", "fist", "thumb")
 
 	cap = cv2.VideoCapture(1)
 
@@ -315,6 +400,8 @@ def main():
 
 				# Find and draw fingertips.
 				finger_tips = hand_detector.detect_finger_tips(hand_contour)
+				lbl = str(hand_classifier.classify(finger_tips, hand_pos))
+				cv2.putText(frame_bgr, "LBL: " + lbl, (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 				for p in finger_tips:
 					cv2.circle(frame_bgr, (int(p[0][0]), int(p[0][1])), 5, (0, 255, 0), -1)
 

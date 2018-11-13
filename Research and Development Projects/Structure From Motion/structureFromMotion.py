@@ -63,6 +63,8 @@ class StructureFromMotion:
 		self.lk_params = dict(winSize=(15, 15),
 		                      maxLevel=3,
 		                      criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
+		self.orb_detector = cv2.ORB_create(400)
+
 
 	def _setupMisc(self):
 		"""
@@ -258,7 +260,7 @@ class StructureFromMotion:
 		Initializes the instance with the previous frame, and finds points to track
 		"""
 		self.previous_frame = self.preprocess_frame(raw_previous_frame)
-		self.previous_frame_points = cv2.goodFeaturesToTrack(self.previous_frame, mask=None, **self.feature_params)
+		self.previous_frame_points, _ = self.orb_detector.detectAndCompute(self.previous_frame, None)#cv2.goodFeaturesToTrack(self.previous_frame, mask=None, **self.feature_params)
 
 	def get_frame_points(self, current_frame, ):
 		"""
@@ -280,7 +282,7 @@ class StructureFromMotion:
 				else:
 					frame_points.append(cam_pos)
 			# self.previous_frame_points = good_new.reshape(-1, 1, 2)
-			self.previous_frame_points = cv2.goodFeaturesToTrack(self.previous_frame, mask=None, **self.feature_params)
+			self.previous_frame_points, _ = self.orb_detector.detectAndCompute(self.previous_frame, None) #cv2.goodFeaturesToTrack(self.previous_frame, mask=None, **self.feature_params)
 		self.previous_frame = current_frame.copy()
 
 		return frame_points
