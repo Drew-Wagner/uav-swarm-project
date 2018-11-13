@@ -289,7 +289,7 @@ class HandPoseClassifier:
 		detector = HandDetector()
 		for arg in args:
 			try:
-				mask = cv2.imread(arg + ".png", 0)
+				mask = cv2.imread("training_images/"+arg + ".png", 0)
 				hand_contour = detector.detect_hand_contour(mask)
 				hand_pos = detector.get_hand_center(hand_contour)
 				fingertips = detector.detect_finger_tips(hand_contour)
@@ -322,7 +322,6 @@ class HandPoseClassifier:
 		for uv in unit_vectors:
 			angles.append(np.arccos(np.dot(uv[0], avg_vector[0])) + compensation_angle)
 		return angles
-
 
 	def classify(self, fingertips, center):
 		"""
